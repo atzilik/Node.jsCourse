@@ -28,7 +28,7 @@ function call(){
         //The whole response has been received. Print out the result.
 
         resp.on('end', () => {
-            console.log('Response completed: ' + data);
+            console.log('Response: ' + data);
             if (++completed === COUNT) {
                 console.log(`SEQUENCE ENDED! ${time.timeEnd()}ms`);
             }
