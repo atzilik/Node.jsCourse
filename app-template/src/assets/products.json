@@ -1,26 +1,26 @@
 [
     {
         "id": "b80d34c9-ca7d-42a8-8134-78944787524e",
-        "categoryId": "100",
+        "categoryId": "b80d34c9-ca7d-42a8-8134-78944787534e",
         "name": "Monitor",
         "itemsInStock": 4
     },
     {
         "id": "d88cc0e3-6b71-48de-8b34-d1afbc62c6ee",
-        "categoryId": "101",
+        "categoryId": "b80d34c9-ca7d-42a8-8134-78944787534e",
         "name": "Mouse",
         "itemsInStock": 7
     },
     {
-        "id": "",
-        "categoryId": "102",
-        "name": "Keypboard",
+        "id": "d88cc0e3-6b71-48de-8b34-d1agbc62c6ee",
+        "categoryId": "d88cc0e3-6b71-48de-8b34-d1afbc62c23e",
+        "name": "Book",
         "itemsInStock": 2
     },
     {
         "id": "0c608311-5b32-409f-bedb-b38f5a5b5305",
-        "categoryId": "103",
-        "name": "Printer",
+        "categoryId": "d88cc0e3-6b71-48de-8b34-d1afbc62c35e",
+        "name": "Bamba",
         "itemsInStock": 0
     }
 ]
