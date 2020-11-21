@@ -27,12 +27,12 @@ const resolveProductHandler = (req: Request, res: Response, next: NextFunction):
 
 router.get('/', (req, res) => res.send(products));
 
-router.post('/', (req, res) => {
+router.get('/:id', resolveProductHandler, (req, res) => {
+  res.send(res.locals.product);
+});
+
+router.post('/', validations.validateNameHandler, (req, res) => {
   const product = req.body as Product;
-  if (!validations.isValidName(product.name)) {
-    res.sendStatus(409);
-    return;
-  }
   product.id = generateId();
   products.push(product);
   console.log(`Added new product successfully`);
@@ -40,18 +40,10 @@ router.post('/', (req, res) => {
   res.status(201).send(product);
 });
 
-router.get('/:id', resolveProductHandler, (req, res) => {
-  res.send(res.locals.product);
-});
-
-router.put('/:id', resolveProductHandler, (req, res) => {
+router.put('/:id', validations.validateNameHandler, resolveProductHandler, (req, res) => {
   const product = req.body as Product;
   product.id = res.locals.product.id;
 
-  if (!validations.isValidName(product.name)) {
-    res.sendStatus(409);
-    return;
-  }
   Object.assign(res.locals.product, product);
   console.log(`Updated successfully`);
 

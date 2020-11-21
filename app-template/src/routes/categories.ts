@@ -46,24 +46,21 @@ const resolveGetProductsByCategoryIdHandler = (req: Request, res: Response, next
 
 router.get('/', (req, res) => res.send(categories));
 
-router.post('/', (req, res) => {
-  const category = req.body as Category;
-  if (!validations.isValidName(category.name)) {
-    res.sendStatus(409);
-    return;
-  }
-  category.id = generateId();
-  categories.push(category);
-
-  res.status(201).send(category);
-});
-
 router.get('/:id', resolveCategoryHandler, (req, res) => {
   res.send(res.locals.category);
 });
 
 router.get('/:id/products', resolveGetProductsByCategoryIdHandler, (req, res) => {
   res.send(res.locals.products);
+});
+
+router.post('/', (req, res) => {
+  const category = req.body as Category;
+
+  category.id = generateId();
+  categories.push(category);
+
+  res.status(201).send(category);
 });
 
 router.put('/:id', resolveCategoryHandler, (req, res) => {
@@ -74,10 +71,7 @@ router.put('/:id', resolveCategoryHandler, (req, res) => {
     res.sendStatus(400);
     return;
   }
-  if (!validations.isValidName(category.name)) {
-    res.sendStatus(409);
-    return;
-  }
+
   Object.assign(res.locals.category, category);
   console.log(`Added new category successfully`);
 
