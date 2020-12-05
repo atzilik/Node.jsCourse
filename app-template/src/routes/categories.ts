@@ -5,6 +5,7 @@ import categoriesData from '../assets/categories.json';
 import { IProduct } from '../models/product';
 import productsData from '../assets/products.json';
 import * as validations from '../helpers/validation';
+import { wrapAsyncAndSend } from '../utils/async';
 
 const router = Router();
 
@@ -44,11 +45,18 @@ const resolveGetProductsByCategoryIdHandler = (req: Request, res: Response, next
   next();
 };
 
+const getCategoryById = (categoryId: string): Promise<ICategory> => {
+  const category = products[Number(categoryId)];
+  return Promise.resolve(category);
+};
+
 router.get('/', (req, res) => res.send(categories));
 
-router.get('/:id', resolveCategoryHandler, (req, res) => {
-  res.send(res.locals.category);
-});
+router.get(
+  '/:id',
+  resolveCategoryHandler,
+  wrapAsyncAndSend((req, res) => getCategoryById(res.locals.categoryIndex)),
+);
 
 router.get('/:id/products', resolveGetProductsByCategoryIdHandler, (req, res) => {
   res.send(res.locals.products);
