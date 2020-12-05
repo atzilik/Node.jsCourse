@@ -6,8 +6,10 @@ import { IProduct } from '../models/product';
 import productsData from '../assets/products.json';
 import * as validations from '../helpers/validation';
 import { wrapAsyncAndSend } from '../utils/async';
+import { createLogger } from '../utils/logger';
 
 const router = Router();
+const logger = createLogger('Categories');
 
 const categories: ICategory[] = categoriesData;
 const products: IProduct[] = productsData;
@@ -54,7 +56,10 @@ router.get('/', (req, res) => res.send(categories));
 
 router.get(
   '/:id',
-  resolveCategoryHandler,
+  resolveCategoryHandler,(req, res) => {
+    logger.info(`Requested category of id ${req.params.id}`);
+    res.send(`Requested category of id ${req.params.id}`);
+  },
   wrapAsyncAndSend((req, res) => getCategoryById(res.locals.categoryIndex)),
 );
 

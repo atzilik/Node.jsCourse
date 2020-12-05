@@ -4,8 +4,12 @@ import { IProduct } from '../models/product';
 import * as validations from '../helpers/validation';
 import { getProducts } from '../helpers/store-products';
 import { wrapAsyncAndSend } from '../utils/async';
+import { createLogger } from '../utils/logger';
+
 const router = Router();
 const products = getProducts();
+
+const logger = createLogger('Products');
 
 const resolveProductHandler = (req: Request, res: Response, next: NextFunction): void => {
   const productId = req.params.id;
@@ -34,6 +38,10 @@ router.get('/', (req, res) => res.send(getProducts()));
 router.get(
   '/:id',
   resolveProductHandler,
+  (req, res) => {
+    logger.info(`Requested product of id ${req.params.id}`);
+    res.send(`Requested product of id ${req.params.id}`);
+  },
   wrapAsyncAndSend((req, res) => getProductById(res.locals.prouctIndex)),
 );
 
