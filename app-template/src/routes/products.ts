@@ -5,6 +5,7 @@ import * as validations from '../helpers/validation';
 import { getProducts } from '../helpers/store-products';
 import { wrapAsyncAndSend } from '../utils/async';
 import { createLogger } from '../utils/logger';
+import { idSchema, newProductSchema } from '../validations/products';
 
 const router = Router();
 const products = getProducts();
@@ -12,11 +13,12 @@ const products = getProducts();
 const logger = createLogger('Products');
 
 const resolveProductHandler = (req: Request, res: Response, next: NextFunction): void => {
-  const productId = req.params.id;
-  if (!validations.isValidUuid(productId)) {
+  const { error, value: productId } = idSchema.validate(req.params.id);
+  if (error) {
     next(new Error('Invalid ID'));
     return;
   }
+
   const prouctIndex = products.findIndex((u) => u.id === productId);
   if (prouctIndex < 0) {
     next(new Error('Product not found'));
@@ -45,13 +47,18 @@ router.get(
   wrapAsyncAndSend((req, res) => getProductById(res.locals.prouctIndex)),
 );
 
-router.post('/', validations.validateNameHandler, (req, res) => {
-  const product = req.body as IProduct;
-  product.id = generateId();
-  products.push(product);
-  console.log(`Added new product successfully`);
+router.post('/', async (req, res, next) => {
+  try {
+    const product = await newProductSchema.validateAsync(req.body);
 
-  res.status(201).send(product);
+    product.id = generateId();
+    products.push(product);
+    console.log(`Added new product successfully`);
+
+    res.status(201).send(product);
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.put('/:id', validations.validateNameHandler, resolveProductHandler, (req, res) => {
