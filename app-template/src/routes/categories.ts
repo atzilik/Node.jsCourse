@@ -1,25 +1,25 @@
 import { generateId } from '../utils/id-helper';
 import { NextFunction, Request, Response, Router } from 'express';
-import { Category } from '../models/category';
+import { ICategory } from '../models/category';
 import categoriesData from '../assets/categories.json';
-import { Product } from '../models/product';
+import { IProduct } from '../models/product';
 import productsData from '../assets/products.json';
-import * as validations from '../utils/common';
+import * as validations from '../helpers/validation';
 
 const router = Router();
 
-const categories: Category[] = categoriesData;
-const products: Product[] = productsData;
+const categories: ICategory[] = categoriesData;
+const products: IProduct[] = productsData;
 
 const resolveCategoryHandler = (req: Request, res: Response, next: NextFunction): void => {
   const categoryId = req.params.id;
   if (!validations.isValidUuid(categoryId)) {
-    res.sendStatus(400);
+    next(new Error('Invalid ID'));
     return;
   }
   const categoryIndex = categories.findIndex((u) => u.id === categoryId);
   if (categoryIndex < 0) {
-    res.sendStatus(404);
+    next(new Error('Not found'));
     return;
   }
   res.locals.categoryIndex = categoryIndex;
@@ -30,12 +30,12 @@ const resolveCategoryHandler = (req: Request, res: Response, next: NextFunction)
 const resolveGetProductsByCategoryIdHandler = (req: Request, res: Response, next: NextFunction): void => {
   const categoryId = req.params.id;
   if (!validations.isValidUuid(categoryId)) {
-    res.sendStatus(400);
+    next(new Error('Invalid ID'));
     return;
   }
   const categoryIndex = products.findIndex((p) => p.categoryId === categoryId);
   if (categoryIndex < 0) {
-    res.sendStatus(404);
+    next(new Error('Not found'));
     return;
   }
 
@@ -55,7 +55,7 @@ router.get('/:id/products', resolveGetProductsByCategoryIdHandler, (req, res) =>
 });
 
 router.post('/', (req, res) => {
-  const category = req.body as Category;
+  const category = req.body as ICategory;
 
   category.id = generateId();
   categories.push(category);
@@ -63,12 +63,12 @@ router.post('/', (req, res) => {
   res.status(201).send(category);
 });
 
-router.put('/:id', resolveCategoryHandler, (req, res) => {
-  const category = req.body as Category;
+router.put('/:id', resolveCategoryHandler, (req, res, next) => {
+  const category = req.body as ICategory;
   category.id = res.locals.category.id;
 
   if (!validations.isValidUuid(category.id)) {
-    res.sendStatus(400);
+    next('Invalid ID');
     return;
   }
 

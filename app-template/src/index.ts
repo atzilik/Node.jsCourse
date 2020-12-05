@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { router as productsRouter } from './routes/products';
 import { router as categoriesRouter } from './routes/categories';
+import * as errorHandlers from './middleware/errorHandlers';
 
 const app = express();
 
@@ -12,6 +13,9 @@ app.get('/hello', (req, res) => res.send('hello back'));
 
 app.use('/api/products', productsRouter);
 app.use('/api/categories', categoriesRouter);
+app.use(errorHandlers.IdErrorHandler);
+app.use(errorHandlers.NameErrorHandler);
+app.use(errorHandlers.NotFoundErrorHandler);
 
 app.set('port', process.env.PORT || 8000);
 

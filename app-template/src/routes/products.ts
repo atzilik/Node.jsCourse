@@ -1,22 +1,21 @@
 import { generateId } from '../utils/id-helper';
 import { NextFunction, Request, Response, Router } from 'express';
-import { Product } from '../models/product';
-import productsData from '../assets/products.json';
-import * as validations from '../utils/common';
-
+import { IProduct } from '../models/product';
+import * as validations from '../helpers/validation';
+import { getProducts } from '../helpers/store-products';
+import { wrapAsyncAndSend } from '../utils/async';
 const router = Router();
-
-const products: Product[] = productsData;
+const products = getProducts();
 
 const resolveProductHandler = (req: Request, res: Response, next: NextFunction): void => {
   const productId = req.params.id;
   if (!validations.isValidUuid(productId)) {
-    res.sendStatus(400);
+    next(new Error('Invalid ID'));
     return;
   }
   const prouctIndex = products.findIndex((u) => u.id === productId);
   if (prouctIndex < 0) {
-    res.sendStatus(404);
+    next(new Error('Product not found'));
     return;
   }
 
@@ -25,14 +24,21 @@ const resolveProductHandler = (req: Request, res: Response, next: NextFunction):
   next();
 };
 
-router.get('/', (req, res) => res.send(products));
+const getProductById = (productId: string): Promise<IProduct> => {
+  const product = products[Number(productId)];
+  return Promise.resolve(product);
+};
 
-router.get('/:id', resolveProductHandler, (req, res) => {
-  res.send(res.locals.product);
-});
+router.get('/', (req, res) => res.send(getProducts()));
+
+router.get(
+  '/:id',
+  resolveProductHandler,
+  wrapAsyncAndSend((req, res) => getProductById(res.locals.prouctIndex)),
+);
 
 router.post('/', validations.validateNameHandler, (req, res) => {
-  const product = req.body as Product;
+  const product = req.body as IProduct;
   product.id = generateId();
   products.push(product);
   console.log(`Added new product successfully`);
@@ -41,7 +47,7 @@ router.post('/', validations.validateNameHandler, (req, res) => {
 });
 
 router.put('/:id', validations.validateNameHandler, resolveProductHandler, (req, res) => {
-  const product = req.body as Product;
+  const product = req.body as IProduct;
   product.id = res.locals.product.id;
 
   Object.assign(res.locals.product, product);
