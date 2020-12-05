@@ -5,6 +5,7 @@ import { traceLogger, errorLogger } from './middleware/log';
 import { router as productsRouter } from './routes/products';
 import { router as categoriesRouter } from './routes/categories';
 import * as errorHandlers from './middleware/errorHandlers';
+import { getConfigValue } from './utils/config';
 
 const app = express();
 
@@ -21,7 +22,7 @@ app.use(errorHandlers.IdErrorHandler);
 app.use(errorHandlers.NameErrorHandler);
 app.use(errorHandlers.NotFoundErrorHandler);
 
-app.set('port', process.env.PORT || 8000);
+app.set('port', getConfigValue('APP_PORT') || 8000);
 
 app.listen(app.get('port'), () => {
   console.log(' App is running at http://localhost:%d in %s mode', app.get('port'), app.get('env'));
