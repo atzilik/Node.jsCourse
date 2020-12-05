@@ -56,9 +56,9 @@ router.get('/', (req, res) => res.send(categories));
 
 router.get(
   '/:id',
-  resolveCategoryHandler,(req, res) => {
+  resolveCategoryHandler,(req, res, next) => {
     logger.info(`Requested category of id ${req.params.id}`);
-    res.send(`Requested category of id ${req.params.id}`);
+    next();
   },
   wrapAsyncAndSend((req, res) => getCategoryById(res.locals.categoryIndex)),
 );

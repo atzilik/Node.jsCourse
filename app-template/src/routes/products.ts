@@ -38,9 +38,9 @@ router.get('/', (req, res) => res.send(getProducts()));
 router.get(
   '/:id',
   resolveProductHandler,
-  (req, res) => {
+  (req, res, next) => {
     logger.info(`Requested product of id ${req.params.id}`);
-    res.send(`Requested product of id ${req.params.id}`);
+    next();
   },
   wrapAsyncAndSend((req, res) => getProductById(res.locals.prouctIndex)),
 );
